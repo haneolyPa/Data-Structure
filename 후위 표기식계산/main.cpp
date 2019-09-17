@@ -11,7 +11,7 @@
 int evalPostfix(char *exp)
 {
 	int oper1, oper2, i = 0;
-	int length = strlen(exp);
+	int length = (int)strlen(exp);
 	char symbol;
 
 	STACK stack = CreateS(length);

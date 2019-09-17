@@ -31,7 +31,7 @@ int main()
 void Infix2Postfix(char* const input, char* output)
 {
 	int i = 0;
-	int inputSize = strlen(input);
+	int inputSize = (int)strlen(input);
 	STACK stack = CreateS(inputSize);
 
 	char stackTop;
