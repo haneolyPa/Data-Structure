@@ -49,7 +49,7 @@ char Pop(STACK_PTR pStack)
 	return pStack->pData[pStack->top--];
 }
 
-void PrintStack(STACK_PTR const pStack)
+void PrintStack(const STACK_PTR pStack)
 {
 	int i;
 	printf("\ntop -> ");

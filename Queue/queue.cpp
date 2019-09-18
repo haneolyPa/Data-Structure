@@ -55,7 +55,7 @@ char Delete_q(QUEUE_PTR pQueue)
 	return pQueue->pData[++pQueue->front];
 }
 
-void PrintQueue(QUEUE_PTR const pQueue)
+void PrintQueue(const QUEUE_PTR pQueue)
 {
 	int i;
 	for (i = -1; i < pQueue->queueSize; i++) {

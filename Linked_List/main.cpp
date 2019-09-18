@@ -9,7 +9,7 @@ typedef struct _linked_list_node {
 typedef LINKED_LIST_NODE* LINKED_LIST_NODE_PTR;
 typedef LINKED_LIST_NODE_PTR LINKEDLIST_HEAD;
 
-typedef LINKED_LIST_NODE_PTR* LINKEDLIST_HEAD_PTR;
+typedef LINKEDLIST_HEAD* LINKEDLIST_HEAD_PTR;
 
 LINKEDLIST_HEAD head = NULL;
 
@@ -32,6 +32,10 @@ LINKED_LIST_NODE_PTR getPrevNodeOfLastNode(LINKEDLIST_HEAD_PTR H);
 // 특정노드의 이전 노드
 // 반환값 : 특정노드의 이전 노드의 포인터
 LINKED_LIST_NODE_PTR getPrevNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode);
+
+// data 를 값인 노드
+// 반환값 : data 를 값인 노드, 없으면 NULL
+LINKED_LIST_NODE_PTR getNode(LINKEDLIST_HEAD_PTR H, int data);
 
 // 리스트 마지막에 노트 추가
 void addNode(LINKEDLIST_HEAD_PTR H, int data);
@@ -96,6 +100,17 @@ LINKED_LIST_NODE_PTR getPrevNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itN
 	return prevNode;
 }
 
+LINKED_LIST_NODE_PTR getNode(LINKEDLIST_HEAD_PTR H, int data)
+{
+	LINKED_LIST_NODE_PTR find_Node = *H;
+
+	if (find_Node != NULL)
+		while (find_Node->link != NULL && !(find_Node->data == data))
+			find_Node = find_Node->link;
+
+	return find_Node;
+}
+
 void addNode(LINKEDLIST_HEAD_PTR H, int data)
 {
 	LINKED_LIST_NODE_PTR new_Node = newNode(data);
@@ -132,8 +147,8 @@ int removeNode(LINKEDLIST_HEAD_PTR H)
 	}
 
 	last_Node = prev_Node->link;
-	prev_Node->link = NULL;
 
+	prev_Node->link = NULL;
 	return deleteNode(last_Node);
 }
 
@@ -146,11 +161,72 @@ int removeitNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode)
 		return -1;
 	}
 
-	prev_Node->link = NULL;
+	prev_Node->link = itNode->link;
 	return deleteNode(itNode);
+}
+
+void PrintList(const LINKEDLIST_HEAD_PTR H)
+{
+	LINKED_LIST_NODE_PTR pNode = *H;
+
+	printf("Head ->");
+
+	while (pNode != NULL) {
+		printf("| %d : Nest | -> ", pNode->data);
+		pNode = pNode->link;
+	}
+
+	printf("| NULL |\n");
 }
 
 int main()
 {
+	PrintList(&head);
+
+	addNode(&head, 100);
+	printf("\n");
+	printf("addNode(&head, 100);\n");
+	PrintList(&head);
+
+	addNode(&head, 200);
+	printf("\n");
+	printf("addNode(&head, 200);\n");
+	PrintList(&head);
+
+	addNode(&head, 300);
+	printf("\n");
+	printf("addNode(&head, 300);\n");
+	PrintList(&head);
+
+	addNode(&head, 400);
+	printf("\n");
+	printf("addNode(&head, 400);\n");
+	PrintList(&head);
+
+	addNode(&head, 500);
+	printf("\n");
+	printf("addNode(&head, 500);\n");
+	PrintList(&head);
+
+	removeNode(&head);
+	printf("\n");
+	printf("removeNode(&head);\n");
+	PrintList(&head);
+
+	additNode(getNode(&head, 100), 150);
+	printf("\n");
+	printf("additNode(getNode(&head, 100), 150);\n");
+	PrintList(&head);
+
+	removeitNode(&head, getNode(&head, 300));
+	printf("\n");
+	printf("removeitNode(&head, getNode(&head, 300));\n");
+	PrintList(&head);
+
+	additNode(getNode(&head, 200), 250);
+	printf("\n");
+	printf("additNode(getNode(&head, 200), 250);\n");
+	PrintList(&head);
+
 	return 0;
 }
