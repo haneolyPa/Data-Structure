@@ -18,3 +18,20 @@ LINKEDLIST_HEAD_PTR createCircularLinkedList_h();
 
 // 리스트 출력
 void PrintList(const LINKEDLIST_HEAD_PTR H);
+
+// 첫번째 노드에 노드 추가
+void addFirstNode(LINKEDLIST_HEAD_PTR H, int data);
+
+// 리스트 마지막에 노트 추가
+void addNode(LINKEDLIST_HEAD_PTR H, int data);
+
+// 리스트 마지막에 노트 삭제
+// 반환값 : 삭제 노트에 들어 있는 값
+void removeFirstNode(LINKEDLIST_HEAD_PTR H);
+
+// 리스트 마지막에 노트 삭제
+// 반환값 : 삭제 노트에 들어 있는 값
+int removeNode(LINKEDLIST_HEAD_PTR H);
+
+// 리스트 삭제
+void RemoveList(LINKEDLIST_HEAD_PTR H);

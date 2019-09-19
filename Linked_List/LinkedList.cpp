@@ -32,6 +32,8 @@ LINKED_LIST_NODE_PTR getFirstNode(LINKEDLIST_HEAD_PTR H)
 // pNode 가 마지막 노드 인가
 bool IsLastNode(LINKED_LIST_NODE_PTR pNode)
 {
+	if (pNode == NULL)
+		return false;
 	return (pNode->link == NULL);
 }
 
