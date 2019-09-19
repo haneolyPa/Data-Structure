@@ -6,10 +6,17 @@ typedef struct _linked_list_node {
 } LINKED_LIST_NODE;
 
 typedef LINKED_LIST_NODE* LINKED_LIST_NODE_PTR;
-typedef LINKED_LIST_NODE_PTR LINKEDLIST_HEAD;
+
+typedef struct _linkedList_h {
+	LINKED_LIST_NODE_PTR head;
+}LINKEDLIST_HEAD ;
+
 typedef LINKEDLIST_HEAD* LINKEDLIST_HEAD_PTR;
 
 extern LINKEDLIST_HEAD head;
+
+// 링크드 리스트 head 를 만듦
+LINKEDLIST_HEAD_PTR createLinkedList_h();
 
 // data 를 값인 노드
 // 반환값 : data 를 값인 노드, 없으면 NULL
@@ -31,3 +38,6 @@ int removeitNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode);
 
 // 리스트 출력
 void PrintList(const LINKEDLIST_HEAD_PTR H);
+
+// 리스트 삭제
+void RemoveList(LINKEDLIST_HEAD_PTR H);

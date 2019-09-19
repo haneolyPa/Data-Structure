@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "LinkedList.h"
 
-LINKEDLIST_HEAD head = NULL;
-
 // 새로운 노드 생성
 // 반환값 : 생성된 노드의 포인터
 LINKED_LIST_NODE_PTR newNode(int data);
@@ -24,6 +22,20 @@ LINKED_LIST_NODE_PTR getPrevNodeOfLastNode(LINKEDLIST_HEAD_PTR H);
 // 반환값 : 특정노드의 이전 노드의 포인터
 LINKED_LIST_NODE_PTR getPrevNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode);
 
+// head 가 가르키는 첫번째 노드
+// 반환값 : 첫번째 노드의 포인터
+LINKED_LIST_NODE_PTR getFirstNode(LINKEDLIST_HEAD_PTR H)
+{
+	return H->head;
+}
+
+LINKEDLIST_HEAD_PTR createLinkedList_h()
+{
+	LINKEDLIST_HEAD_PTR pHead = (LINKEDLIST_HEAD_PTR)malloc(sizeof(LINKEDLIST_HEAD));
+	pHead->head = NULL;
+	return pHead;
+}
+
 LINKED_LIST_NODE_PTR newNode(int data)
 {
 	LINKED_LIST_NODE_PTR newnode = (LINKED_LIST_NODE_PTR)malloc(sizeof(LINKED_LIST_NODE));
@@ -41,7 +53,7 @@ int deleteNode(LINKED_LIST_NODE_PTR prevNode)
 
 LINKED_LIST_NODE_PTR getLastNode(LINKEDLIST_HEAD_PTR H)
 {
-	LINKED_LIST_NODE_PTR lastNode = *H;
+	LINKED_LIST_NODE_PTR lastNode = getFirstNode(H);
 
 	if (lastNode != NULL)
 		while (lastNode->link != NULL)
@@ -52,7 +64,7 @@ LINKED_LIST_NODE_PTR getLastNode(LINKEDLIST_HEAD_PTR H)
 
 LINKED_LIST_NODE_PTR getPrevNodeOfLastNode(LINKEDLIST_HEAD_PTR H)
 {
-	LINKED_LIST_NODE_PTR prevNode = *H;
+	LINKED_LIST_NODE_PTR prevNode = getFirstNode(H);
 
 	if (prevNode != NULL && prevNode->link != NULL)
 		while (prevNode->link->link != NULL)
@@ -63,7 +75,7 @@ LINKED_LIST_NODE_PTR getPrevNodeOfLastNode(LINKEDLIST_HEAD_PTR H)
 
 LINKED_LIST_NODE_PTR getPrevNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode)
 {
-	LINKED_LIST_NODE_PTR prevNode = *H;
+	LINKED_LIST_NODE_PTR prevNode = getFirstNode(H);
 
 	if (prevNode != NULL)
 		while (prevNode->link != NULL && prevNode->link != itNode)
@@ -74,13 +86,20 @@ LINKED_LIST_NODE_PTR getPrevNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itN
 
 LINKED_LIST_NODE_PTR getNode(LINKEDLIST_HEAD_PTR H, int data)
 {
-	LINKED_LIST_NODE_PTR find_Node = *H;
+	LINKED_LIST_NODE_PTR find_Node = getFirstNode(H);
+	if (getFirstNode(H) == NULL)
+		return NULL;
 
-	if (find_Node != NULL)
-		while (find_Node->link != NULL && !(find_Node->data == data))
-			find_Node = find_Node->link;
+	if (find_Node->data == data)
+		return find_Node;
 
-	return find_Node;
+	while (find_Node->link != NULL) {
+		find_Node = find_Node->link;
+		if (find_Node->data == data)
+			return find_Node;
+	}
+
+	return NULL;
 }
 
 void addNode(LINKEDLIST_HEAD_PTR H, int data)
@@ -89,7 +108,7 @@ void addNode(LINKEDLIST_HEAD_PTR H, int data)
 
 	LINKED_LIST_NODE_PTR lastNode = getLastNode(H);
 	if (lastNode == NULL) {
-		*H = new_Node;
+		H->head = new_Node;
 		return;
 	}
 
@@ -113,9 +132,10 @@ int removeNode(LINKEDLIST_HEAD_PTR H)
 		return -1;
 	}
 
-	if (*H == prev_Node) {
-		*H = NULL;
-		return deleteNode(last_Node);
+	// 노드가 하나뿐인 경우!!
+	if (prev_Node->link == NULL) {
+		H->head = NULL;
+		return deleteNode(prev_Node);
 	}
 
 	last_Node = prev_Node->link;
@@ -128,9 +148,14 @@ int removeitNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode)
 {
 	LINKED_LIST_NODE_PTR prev_Node = getPrevNode(H, itNode);
 
-	if (prev_Node == NULL || prev_Node->link == NULL) {
+	if (prev_Node == NULL) {
 		printf("삭제하려는 노드를 찾을 수 없습니다!!!");
 		return -1;
+	}
+
+	if (prev_Node->link == NULL) {
+		H->head = NULL;
+		return deleteNode(prev_Node);
 	}
 
 	prev_Node->link = itNode->link;
@@ -139,9 +164,9 @@ int removeitNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode)
 
 void PrintList(const LINKEDLIST_HEAD_PTR H)
 {
-	LINKED_LIST_NODE_PTR pNode = *H;
+	LINKED_LIST_NODE_PTR pNode = getFirstNode(H);
 
-	printf("Head ->");
+	printf("Head -> ");
 
 	while (pNode != NULL) {
 		printf("| %d : Nest | -> ", pNode->data);
@@ -150,3 +175,17 @@ void PrintList(const LINKEDLIST_HEAD_PTR H)
 
 	printf("| NULL |\n");
 }
+
+void RemoveList(LINKEDLIST_HEAD_PTR H)
+{
+	LINKED_LIST_NODE_PTR pNext_Node = NULL;
+
+	for (LINKED_LIST_NODE_PTR pNode = getFirstNode(H); pNode != NULL; ) {
+		pNext_Node = pNode->link;
+		deleteNode(pNode);
+		pNode = pNext_Node;
+	}
+
+	free(H);
+}
+
