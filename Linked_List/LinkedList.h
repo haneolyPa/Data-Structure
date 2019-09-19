@@ -13,8 +13,6 @@ typedef struct _linkedList_h {
 
 typedef LINKEDLIST_HEAD* LINKEDLIST_HEAD_PTR;
 
-extern LINKEDLIST_HEAD head;
-
 // 링크드 리스트 head 를 만듦
 LINKEDLIST_HEAD_PTR createLinkedList_h();
 

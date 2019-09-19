@@ -29,6 +29,12 @@ LINKED_LIST_NODE_PTR getFirstNode(LINKEDLIST_HEAD_PTR H)
 	return H->head;
 }
 
+// pNode 가 마지막 노드 인가
+bool IsLastNode(LINKED_LIST_NODE_PTR pNode)
+{
+	return (pNode->link == NULL);
+}
+
 LINKEDLIST_HEAD_PTR createLinkedList_h()
 {
 	LINKEDLIST_HEAD_PTR pHead = (LINKEDLIST_HEAD_PTR)malloc(sizeof(LINKEDLIST_HEAD));
@@ -53,50 +59,50 @@ int deleteNode(LINKED_LIST_NODE_PTR prevNode)
 
 LINKED_LIST_NODE_PTR getLastNode(LINKEDLIST_HEAD_PTR H)
 {
-	LINKED_LIST_NODE_PTR lastNode = getFirstNode(H);
+	LINKED_LIST_NODE_PTR pNode = getFirstNode(H);
 
-	if (lastNode != NULL)
-		while (lastNode->link != NULL)
-			lastNode = lastNode->link;
+	if (pNode != NULL)
+		while (!IsLastNode(pNode))
+			pNode = pNode->link;
 
-	return lastNode;
+	return pNode;
 }
 
 LINKED_LIST_NODE_PTR getPrevNodeOfLastNode(LINKEDLIST_HEAD_PTR H)
 {
-	LINKED_LIST_NODE_PTR prevNode = getFirstNode(H);
+	LINKED_LIST_NODE_PTR pNode = getFirstNode(H);
 
-	if (prevNode != NULL && prevNode->link != NULL)
-		while (prevNode->link->link != NULL)
-			prevNode = prevNode->link;
+	if (pNode != NULL && !IsLastNode(pNode))
+		while (pNode->link->link != NULL)
+			pNode = pNode->link;
 
-	return prevNode;
+	return pNode;
 }
 
 LINKED_LIST_NODE_PTR getPrevNode(LINKEDLIST_HEAD_PTR H, LINKED_LIST_NODE_PTR itNode)
 {
-	LINKED_LIST_NODE_PTR prevNode = getFirstNode(H);
+	LINKED_LIST_NODE_PTR pNode = getFirstNode(H);
 
-	if (prevNode != NULL)
-		while (prevNode->link != NULL && prevNode->link != itNode)
-			prevNode = prevNode->link;
+	if (pNode != NULL)
+		while (pNode->link != itNode && !IsLastNode(pNode))
+			pNode = pNode->link;
 
-	return prevNode;
+	return pNode;
 }
 
 LINKED_LIST_NODE_PTR getNode(LINKEDLIST_HEAD_PTR H, int data)
 {
-	LINKED_LIST_NODE_PTR find_Node = getFirstNode(H);
+	LINKED_LIST_NODE_PTR pNode = getFirstNode(H);
 	if (getFirstNode(H) == NULL)
 		return NULL;
 
-	if (find_Node->data == data)
-		return find_Node;
+	if (pNode->data == data)
+		return pNode;
 
-	while (find_Node->link != NULL) {
-		find_Node = find_Node->link;
-		if (find_Node->data == data)
-			return find_Node;
+	while (!IsLastNode(pNode)) {
+		pNode = pNode->link;
+		if (pNode->data == data)
+			return pNode;
 	}
 
 	return NULL;
@@ -105,7 +111,6 @@ LINKED_LIST_NODE_PTR getNode(LINKEDLIST_HEAD_PTR H, int data)
 void addNode(LINKEDLIST_HEAD_PTR H, int data)
 {
 	LINKED_LIST_NODE_PTR new_Node = newNode(data);
-
 	LINKED_LIST_NODE_PTR lastNode = getLastNode(H);
 	if (lastNode == NULL) {
 		H->head = new_Node;
