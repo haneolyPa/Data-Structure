@@ -56,7 +56,7 @@ void PrintList(const LINKEDLIST_HEAD_PTR H)
 		}
 	}
 
-	printf("| NULL |\n");
+	printf("| First Node |\n");
 }
 
 void addFirstNode(LINKEDLIST_HEAD_PTR H, int data)
