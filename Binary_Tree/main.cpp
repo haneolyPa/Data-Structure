@@ -53,6 +53,36 @@ void deleteBTree(BIN_TREE_PTR tree)
 	free(tree);
 }
 
+// 전위 순회
+void preorder(TREE_NODE_PTR node)
+{
+	if (node != NULL) {
+		printf("%c", node->info);
+		preorder(node->left);
+		preorder(node->right);
+	}
+}
+
+// 중위 순회
+void inorder(TREE_NODE_PTR node)
+{
+	if (node != NULL) {
+		inorder(node->left);
+		printf("%c", node->info);
+		inorder(node->right);
+	}
+}
+
+// 후위 순회
+void postorder(TREE_NODE_PTR node)
+{
+	if (node != NULL) {
+		postorder(node->left);
+		postorder(node->right);
+		printf("%c", node->info);
+	}
+}
+
 int main()
 {
 	BIN_TREE_PTR pBTree = createBTree();
@@ -69,5 +99,14 @@ int main()
 	TREE_NODE_PTR pNode_Mul = createBNode('*', pNode_D, pNode_E);
 
 	pBTree->root = createBNode('-', pNode_Sub_1, pNode_Mul);
+
+	preorder(pBTree->root);
+	printf("\n");
+
+	inorder(pBTree->root);
+	printf("\n");
+
+	postorder(pBTree->root);
+	printf("\n");
 	return 0;
 }
