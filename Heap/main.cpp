@@ -62,6 +62,21 @@ void hsort_min_up(HEAP_PTR heap, int pos)
 	hsort_min_up(heap, temp);
 }
 
+void hsort_max_up(HEAP_PTR heap, int pos)
+{
+	int temp;
+	if (pos == 0)
+		return;
+
+	temp = ((pos + 1) / 2) - 1;
+
+	if (heap->data[pos] < heap->data[temp])
+		return;
+
+	swap(&heap->data[pos], &heap->data[temp]);
+	hsort_max_up(heap, temp);
+}
+
 void hsort_min_down(HEAP_PTR heap, int pos)
 {
 	int temp = (pos * 2) + 2;
@@ -77,7 +92,23 @@ void hsort_min_down(HEAP_PTR heap, int pos)
 		swap(&heap->data[pos], &heap->data[temp - 1]);
 		hsort_min_down(heap, temp-1);
 	}
-		
+}
+
+void hsort_max_down(HEAP_PTR heap, int pos)
+{
+	int temp = (pos * 2) + 2;
+	if (temp >= HEAP_MAXSIZE)
+		return;
+
+	if (heap->data[pos] < heap->data[temp] && heap->data[temp] != 0) {
+		swap(&heap->data[pos], &heap->data[temp]);
+		hsort_max_down(heap, temp);
+	}
+
+	if (heap->data[pos] < heap->data[temp - 1] && heap->data[temp - 1] != 0) {
+		swap(&heap->data[pos], &heap->data[temp - 1]);
+		hsort_max_down(heap, temp - 1);
+	}
 }
 
 // Èü Á¤·Ä
@@ -85,14 +116,16 @@ void hsort_up(HEAP_PTR heap)
 {
 	if (heap->type == MIN_HEAP )
 		hsort_min_up(heap, heap->input_pos - 1);
-	/*else
-		hsort_max(heap);*/
+	else
+		hsort_max_up(heap, heap->input_pos - 1);
 }
 
 void hsort_down(HEAP_PTR heap)
 {
 	if (heap->type == MIN_HEAP)
 		hsort_min_down(heap, 0);
+	else
+		hsort_max_down(heap, 0);
 }
 
 void addNode_heap(HEAP_PTR heap, int data)
@@ -122,7 +155,7 @@ void delNode_heap(HEAP_PTR heap)
 
 int main()
 {
-	HEAP_PTR heap = createHeap(MIN_HEAP);
+	HEAP_PTR heap = createHeap(MAX_HEAP);
 	printHeap(heap);
 
 	addNode_heap(heap, 10);
