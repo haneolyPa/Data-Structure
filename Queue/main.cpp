@@ -26,5 +26,8 @@ int main()
 	Add_q(&queue, 'D');
 	PrintQueue(&queue);
 
+	Add_q(&queue, 'E');
+	PrintQueue(&queue);
+
 	return 0;
 }
