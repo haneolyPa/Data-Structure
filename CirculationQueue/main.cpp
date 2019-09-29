@@ -38,7 +38,8 @@ QUEUE Create_q(int queueSize)
 
 bool IsFull_q(QUEUE_PTR pQueue)
 {
-	if ((pQueue->rear == pQueue->front) && pQueue->isFull)
+	if ((pQueue->front == -1 && (pQueue->rear == pQueue->queueSize - 1)) ||
+		((pQueue->rear == pQueue->front) && pQueue->isFull))
 		return true;
 	else
 		return false;
@@ -121,16 +122,28 @@ int main()
 	Add_q(&queue, 'C');
 	PrintQueue(&queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
-
-	Delete_q(&queue);
-	PrintQueue(&queue);
-
-	Delete_q(&queue);
-	PrintQueue(&queue);
-
 	Add_q(&queue, 'D');
+	PrintQueue(&queue);
+
+	Add_q(&queue, 'E');
+	PrintQueue(&queue);
+
+	Add_q(&queue, 'F');
+	PrintQueue(&queue);
+
+	Add_q(&queue, 'G');
+	PrintQueue(&queue);
+
+	Add_q(&queue, 'I');
+	PrintQueue(&queue);
+
+	Delete_q(&queue);
+	PrintQueue(&queue);
+
+	Delete_q(&queue);
+	PrintQueue(&queue);
+
+	Delete_q(&queue);
 	PrintQueue(&queue);
 
 	Add_q(&queue, 'E');
