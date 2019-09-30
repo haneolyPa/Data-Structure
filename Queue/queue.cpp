@@ -5,17 +5,23 @@
 
 #include "queue.h"
 
-QUEUE Create_q(int queueSize)
+QUEUE_PTR Create_q(int queueSize)
 {
-	QUEUE queue;
+	QUEUE_PTR pQueue = (QUEUE_PTR)malloc(sizeof(QUEUE));;
 
-	queue.front = -1;
-	queue.rear = -1;
-	queue.queueSize = queueSize;
-	queue.pData = (char *)malloc(sizeof(char) * queueSize);
-	memset(queue.pData, 0, sizeof(sizeof(char) * queueSize));
+	pQueue->front = -1;
+	pQueue->rear = -1;
+	pQueue->queueSize = queueSize;
+	pQueue->pData = (char *)malloc(sizeof(char) * queueSize);
+	memset(pQueue->pData, 0, sizeof(sizeof(char) * queueSize));
 
-	return queue;
+	return pQueue;
+}
+
+void delete_q(QUEUE_PTR pQueue)
+{
+	free(pQueue->pData);
+	free(pQueue);
 }
 
 bool IsFull_q(QUEUE_PTR pQueue)

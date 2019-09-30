@@ -1,292 +1,195 @@
-#include<stdio.h>
-#include<malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#define FALSE 0
-#define TRUE 1
+#define max(a,b)    (((a) > (b)) ? (a) : (b))
 
-typedef char BOOL;
-
-struct Node {
-	void* key;
-	int height;   // 서브트리 높이
-
-	struct Node* left;
-	struct Node* right;
-};
-
-struct Tree {
-	unsigned int count;
-	BOOL(*compare)(void* argu1, void* argu2);  // 왼쪽으로 보내야 되면 TRUE
-
-	struct Node* root;
-};
-
-struct Tree* CreateTree(BOOL *(compFunc)(void* argu1, void* argu2));
-void addNode(struct Tree*, void*);
-BOOL _insert(struct Tree*, struct Node**, struct Node*);  // 트리의 높이가 높아졌는지를 BOOL 타입으로 리턴한다. 높이가 높아지면 TRUE를 리턴.
-				// 루트는 NULL이 아니라고 가정한다.
-BOOL Compare(void*, void*);
-void Traverse(struct Node*);
-struct Node* leftBalance(struct Node*);
-struct Node* rightBalance(struct Node*);
-struct Node* rottLeft(struct Node*);
-struct Node* rottRight(struct Node*);
-int GetHeightDiff(struct Node*);
-
-struct Tree* CreateTree(BOOL(compFunc)(void*, void*))
+typedef struct AvlNode
 {
-	struct Tree* newTree;
+	int data; // key 값
+	AvlNode *left_child, *right_child;
+}AvlNode;
 
-	newTree = (struct Tree*)malloc(sizeof(struct Tree));
-	newTree->count = 0;
-	newTree->root = NULL;
-	newTree->compare = compFunc;
+AvlNode *root;
 
-	return newTree;
+
+// LL 회전 (오른쪽으로 회전한다)
+//     A
+//    /                B
+//   B        ->      / \
+//  /                C   A
+// C
+//
+// ±2를 가지는 A가 부모가 되고 A->left_child인 B가 child가 된다.
+// A->left에 B가 가지고 있는 right_child를 대입하고 B의 right_child에 A을 대입한다.
+
+AvlNode* rotate_LL(AvlNode *parent)
+{
+	AvlNode *child = parent->left_child;
+	parent->left_child = child->right_child;
+	child->right_child = parent;
+	return child;
 }
 
-void AddNode(struct Tree* tree, void* data)
+// RR 회전 (왼쪽으로 회전한다)
+//     A
+//      \               B
+//       B     ->      / \
+//        \           A   C
+//         C
+//
+// ±2를 가지는 A가 부모가 되고 A->right_child인 B가 child가 된다.
+// A->right에 B가 가지고 있는 left_child를 대입하고 B의 left_child에 A을 대입한다.
+
+AvlNode* rotate_RR(AvlNode *parent)
 {
-	struct Node* node;
+	AvlNode *child = parent->right_child;
+	parent->right_child = child->left_child;
+	child->left_child = parent;
+	return child;
+}
 
-	node = (struct Node*)malloc(sizeof(struct Node));
-	node->height = 1;
-	node->key = data;
-	node->left = NULL;
-	node->right = NULL;
+// RL 회전 (오른쪽-왼쪽으로 회전한다)
+//     A                A              
+//      \                \                C
+//       B      ->        C      ->      / \
+//      /                  \            A   B
+//     C                    B
+//
+// ±2를 가지는 A가 부모가 되고 A->right_child인 B가 child가 된다.
+// A->right_child에 rotate_LL(B)가 반환하는 값을 대입한다. (B,C에 대해 오른쪽 회전)
+// rotate_LL(B)호출시 B와 C가 변화가 생기고 다시 rotate_RR(A)을 호출하면 균형트리가 된다. 
 
-	if (tree->count == 0) {
-		tree->root = node;
-		tree->count++;
+AvlNode* rotate_RL(AvlNode *parent)
+{
+	AvlNode *child = parent->right_child;
+	parent->right_child = rotate_LL(child);
+	return rotate_RR(parent);
+}
+
+// LR 회전 (왼쪽-오른쪽으로 회전한다)
+//     A                 A              
+//	  /                 /                  C
+//   B         ->      C          ->      / \
+//    \               /                  A   B
+//     C             B      
+//
+// ±2를 가지는 A가 부모가 되고 A->left_child인 B가 child가 된다.
+// A->left_child에 rotate_RR(B)가 반환하는 값을 대입한다. (B,C에 대해 왼쪽 회전)
+// rotate_RR(B)호출시 B와 C가 변화가 생기고 다시 rotate_LL(A)을 호출하면 균형트리가 된다. 
+
+AvlNode* rotate_LR(AvlNode *parent)
+{
+	AvlNode *child = parent->left_child;
+	parent->left_child = rotate_RR(child);
+	return rotate_LL(parent);
+}
+
+// 트리의 높이 측정 함수
+// 순환호출로 각각의 높이를 구하고 이들 중에서 더 큰값에 1을 더하면 트리의 높이가 된다.
+int get_height(AvlNode *node)
+{
+	int height = 0;
+	if (node != NULL)
+		height = 1 + max(get_height(node->left_child), get_height(node->right_child));
+	return height;
+}
+
+// 노드의 균형인수 반환 함수
+// 왼쪽 서브트리 높이 - 오른쪽 서브트리 높이
+int get_balance(AvlNode *node)
+{
+	if (node == NULL) return 0;
+	return get_height(node->left_child) - get_height(node->right_child);
+}
+
+// 균형 트리를 만드는 함수
+AvlNode* balance_tree(AvlNode **node)
+{
+	int height_diff = get_balance(*node);
+
+	if (height_diff > 1) // 왼쪽 서브트리의 균형을 맞춘다
+	{
+		if (get_balance((*node)->left_child) > 0)
+			*node = rotate_LL(*node);
+		else
+			*node = rotate_LR(*node);
+	}
+	else if (height_diff < -1) // 오른쪽 서브트리의 균형을 맞춘다
+	{
+		if (get_balance((*node)->right_child) < 0)
+			*node = rotate_RR(*node);
+		else
+			*node = rotate_RL(*node);
+	}
+	return *node;
+}
+
+// AVL 트리의 삽입 연산
+// key에 대해 순환호출을 반복하므로써 트리에 삽입 한 후 균형화 함수를 호출한다.
+AvlNode* avl_add(AvlNode **root, int key)
+{
+	if (*root == NULL)
+	{
+		*root = (AvlNode*)malloc(sizeof(AvlNode));
+		if (*root == NULL)
+		{
+			printf("메모리 할당 실패\n");
+			exit(-1);
+		}
+
+		(*root)->data = key;
+		(*root)->left_child = (*root)->right_child = NULL;
+	}
+	else if (key < (*root)->data)
+	{
+		(*root)->left_child = avl_add(&((*root)->left_child), key);
+		(*root) = balance_tree(root);
+	}
+	else if (key > (*root)->data)
+	{
+		(*root)->right_child = avl_add(&((*root)->right_child), key);
+		(*root) = balance_tree(root);
 	}
 	else
-		_insert(tree, &(tree->root), node);
-}
-
-BOOL _insert(struct Tree* tree, struct Node** root, struct Node* node)
-{
-	if (tree->compare((*root)->key, node->key)) {
-		if ((*root)->left == NULL) {
-			(*root)->left = node;
-			tree->count++;
-			if ((*root)->right == NULL) {
-				(*root)->height++;
-
-				return TRUE;
-			}
-			else {
-				return FALSE;
-			}
-		}
-		else {
-			if (_insert(tree, &((*root)->left), node)) {
-				(*root)->height++;
-				if (GetHeightDiff((*root)) > 0)     // 왼쪽이 더 높으면
-					(*root) = leftBalance((*root));    // 밸런싱
-				return TRUE;
-			}
-			else {
-				return FALSE;
-			}
-		}
+	{
+		printf("중복 키로 인한 삽입 실패\n");
+		exit(-1);
 	}
-	else {
-		if ((*root)->right == NULL) {
-			(*root)->right = node;
-			tree->count++;
-			if ((*root)->left == NULL) {
-				(*root)->height++;
-
-				return TRUE;
-			}
-			else {
-				return FALSE;
-			}
-		}
-		else {
-			if (_insert(tree, &((*root)->right), node)) {
-				(*root)->height++;
-				if (GetHeightDiff((*root)) < 0)
-					(*root) = rightBalance((*root));
-				return TRUE;
-			}
-			else {
-				return FALSE;
-			}
-		}
-	}
+	return *root;
 }
 
-int GetHeightDiff(struct Node* root)
+// AVL 트리 탐색 함수
+// 일반 적인 이진 트리의 탐색 함수와 같다. AVL도 이진 탐색 트리의 일종이다.
+AvlNode* avl_search(AvlNode *node, int key)
 {
-	int left = 0;
-	int right = 0;
+	if (node == NULL) return NULL;
 
-	if (root->left != NULL)
-		left = root->left->height;
+	printf("%d->", node->data);
 
-	if (root->right != NULL)
-		right = root->right->height;
-
-	return left - right;
-}
-
-struct Node* leftBalance(struct Node* root)
-{
-
-	if (GetHeightDiff(root->left) > 0)
-		root = rottRight(root);
-	else {
-		root->left = rottLeft(root->left);
-		root = rottRight(root);
-	}
-
-	return root;
-}
-
-struct Node* rightBalance(struct Node* root)
-{
-
-	if (GetHeightDiff(root->right) < 0)
-		root = rottLeft(root);
-	else {
-		root->right = rottRight(root->right);
-		root = rottLeft(root);
-	}
-
-	return root;
-}
-
-int getHeight(struct Node* node)
-{
-	if (node == NULL)
-		return 0;
+	if (key == node->data)
+		return node;
+	else if (key < node->data)
+		avl_search(node->left_child, key);
 	else
-		return node->height;
-}
-
-struct Node* rottRight(struct Node* root)
-{
-	struct Node* tmp;
-
-	tmp = root->left;
-	root->left = tmp->right;
-	tmp->right = root;
-
-	if (getHeight(root->left) > getHeight(root->right)) {
-		root->height = getHeight(root->left) + 1;
-	}
-	else {
-		root->height = getHeight(root->right) + 1;
-	}
-
-	if (getHeight(tmp->left) > getHeight(tmp->right)) {
-		tmp->height = getHeight(tmp->left) + 1;
-	}
-	else {
-		tmp->height = getHeight(tmp->right) + 1;
-	}
-
-	return tmp;
-}
-
-struct Node* rottLeft(struct Node* root)
-{
-	struct Node* tmp;
-
-	tmp = root->right;
-	root->right = tmp->left;
-	tmp->left = root;
-
-	if (getHeight(root->left) > getHeight(root->right)) {
-		root->height = getHeight(root->left) + 1;
-	}
-	else {
-		root->height = getHeight(root->right) + 1;
-	}
-
-	if (getHeight(tmp->left) > getHeight(tmp->right)) {
-		tmp->height = getHeight(tmp->left) + 1;
-	}
-	else {
-		tmp->height = getHeight(tmp->right) + 1;
-	}
-
-	return tmp;
-}
-
-BOOL Compare(void* argu1, void* argu2)
-{
-	if ((*(int*)(argu1)) > (*(int*)(argu2)))
-		return TRUE;
-	else
-		return FALSE;
-}
-
-void Traverse(struct Node* root)
-{
-	if (root == NULL)
-		return;
-
-	printf("%d(%d)\n", *(int*)(root->key), GetHeightDiff(root));
-	Traverse(root->left);
-	Traverse(root->right);
+		avl_search(node->right_child, key);
 }
 
 int main()
 {
-	struct Tree* tree;
-	int* key;
+	avl_add(&root, 8);
+	avl_add(&root, 9);
+	avl_add(&root, 10);
+	avl_add(&root, 2);
+	avl_add(&root, 1);
+	avl_add(&root, 5);
+	avl_add(&root, 3);
+	avl_add(&root, 6);
+	avl_add(&root, 4);
+	avl_add(&root, 7);
+	avl_add(&root, 11);
+	avl_add(&root, 12);
 
-	tree = CreateTree(Compare);
+	avl_search(root, 12);
 
-	key = (int*)malloc(sizeof(int));
-	*key = 3;
-	AddNode(tree, (void*)key);
-
-	Traverse(tree->root);
-	printf("\n");
-
-	key = (int*)malloc(sizeof(int));
-	*key = 4;
-	AddNode(tree, (void*)key);
-
-	Traverse(tree->root);
-	printf("\n");
-
-	key = (int*)malloc(sizeof(int));
-	*key = 5;
-	AddNode(tree, (void*)key);
-
-	Traverse(tree->root);
-	printf("\n");
-
-	key = (int*)malloc(sizeof(int));
-	*key = 2;
-	AddNode(tree, (void*)key);
-
-	Traverse(tree->root);
-	printf("\n");
-
-	key = (int*)malloc(sizeof(int));
-	*key = 7;
-	AddNode(tree, (void*)key);
-
-	Traverse(tree->root);
-	printf("\n");
-
-	key = (int*)malloc(sizeof(int));
-	*key = 9;
-	AddNode(tree, (void*)key);
-
-	Traverse(tree->root);
-	printf("\n");
-
-	key = (int*)malloc(sizeof(int));
-	*key = 11;
-	AddNode(tree, (void*)key);
-
-	Traverse(tree->root);
-	printf("\n");
-	return 1;
+	return 0;
 }

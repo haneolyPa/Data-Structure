@@ -62,6 +62,8 @@ void Infix2Postfix(char* const input, char* output)
 		*output = Pop(stack);
 		output++;
 	}
+
+	deleteS(stack);
 }
 
 bool isOperator(char input)

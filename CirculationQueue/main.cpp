@@ -14,26 +14,31 @@ typedef struct _queue
 
 typedef QUEUE* QUEUE_PTR;
 
-QUEUE Create_q(int queueSize);
+QUEUE_PTR Create_q(int queueSize);
+void delete_q(QUEUE_PTR pQueue);
 bool IsFull_q(QUEUE_PTR pQueue);
 bool IsEmpty_q(QUEUE_PTR pQueue);
 void Add_q(QUEUE_PTR pQueue, char data);
 void Delete_q(QUEUE_PTR pQueue);
 void PrintQueue(const QUEUE_PTR pQueue);
 
-QUEUE Create_q(int queueSize)
+QUEUE_PTR Create_q(int queueSize)
 {
-	QUEUE queue;
+	QUEUE_PTR pQueue = (QUEUE_PTR)malloc(sizeof(QUEUE));;
 
-	queue.front = -1;
-	queue.rear = -1;
-	queue.queueSize = queueSize;
-	queue.pData = (char *)malloc(sizeof(char) * queueSize);
-	memset(queue.pData, 0, sizeof(sizeof(char) * queueSize));
+	pQueue->front = -1;
+	pQueue->rear = -1;
+	pQueue->queueSize = queueSize;
+	pQueue->pData = (char *)malloc(sizeof(char) * queueSize);
+	memset(pQueue->pData, 0, sizeof(sizeof(char) * queueSize));
 
-	queue.isFull = false;
+	return pQueue;
+}
 
-	return queue;
+void delete_q(QUEUE_PTR pQueue)
+{
+	free(pQueue->pData);
+	free(pQueue);
 }
 
 bool IsFull_q(QUEUE_PTR pQueue)
@@ -110,68 +115,70 @@ void PrintQueue(const QUEUE_PTR pQueue)
 
 int main()
 {
-	QUEUE queue = Create_q(4);
-	PrintQueue(&queue);
+	QUEUE_PTR queue = Create_q(4);
+	PrintQueue(queue);
 
-	Add_q(&queue, 'A');
-	PrintQueue(&queue);
+	Add_q(queue, 'A');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'B');
-	PrintQueue(&queue);
+	Add_q(queue, 'B');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'C');
-	PrintQueue(&queue);
+	Add_q(queue, 'C');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'D');
-	PrintQueue(&queue);
+	Add_q(queue, 'D');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'E');
-	PrintQueue(&queue);
+	Add_q(queue, 'E');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'F');
-	PrintQueue(&queue);
+	Add_q(queue, 'F');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'G');
-	PrintQueue(&queue);
+	Add_q(queue, 'G');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'I');
-	PrintQueue(&queue);
+	Add_q(queue, 'I');
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
 
-	Add_q(&queue, 'E');
-	PrintQueue(&queue);
+	Add_q(queue, 'E');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'F');
-	PrintQueue(&queue);
+	Add_q(queue, 'F');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'G');
-	PrintQueue(&queue);
+	Add_q(queue, 'G');
+	PrintQueue(queue);
 
-	Add_q(&queue, 'I');
-	PrintQueue(&queue);
+	Add_q(queue, 'I');
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
 
-	Delete_q(&queue);
-	PrintQueue(&queue);
+	Delete_q(queue);
+	PrintQueue(queue);
+
+	//delete_q(queue);
 
 	return 0;
 }
