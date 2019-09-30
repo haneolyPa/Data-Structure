@@ -7,15 +7,21 @@
 
 #include "Stack.h"
 
-STACK CreateS(int stackSize)
+STACK_PTR CreateS(int stackSize)
 {
-	STACK stack;
+	STACK_PTR pStack = (STACK_PTR)malloc(sizeof(STACK));
 
-	stack.top = -1;
-	stack.stackSize = stackSize;
-	stack.pData = (char *)malloc(sizeof(char) * stackSize);
+	pStack->top = -1;
+	pStack->stackSize = stackSize;
+	pStack->pData = (char *)malloc(sizeof(char) * stackSize);
 
-	return stack;
+	return pStack;
+}
+
+void deleteS(STACK_PTR pStack)
+{
+	free(pStack->pData);
+	free(pStack);
 }
 
 bool is_stack_emuty(STACK_PTR pStack)
@@ -49,7 +55,7 @@ char Pop(STACK_PTR pStack)
 	return pStack->pData[pStack->top--];
 }
 
-void PrintStack(STACK_PTR const pStack)
+void PrintStack(const STACK_PTR pStack)
 {
 	int i;
 	printf("\ntop -> ");

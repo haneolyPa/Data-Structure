@@ -32,23 +32,23 @@ void Infix2Postfix(char* const input, char* output)
 {
 	int i = 0;
 	int inputSize = (int)strlen(input);
-	STACK stack = CreateS(inputSize);
+	STACK_PTR stack = CreateS(inputSize);
 
 	char stackTop;
 
 	while (i < inputSize) {
 		if (isOperator(input[i])) {				// 연산자 인가?
-			stackTop = GetTopData(&stack);
+			stackTop = GetTopData(stack);
 
 			// 스텍에 있는 연사자 보다 input[i] 가 우선순위가 낮으면
 			// 스텍에 있는 연산자를 모두 Pop 합니다.
 			if (Oper_Precedence(stackTop, input[i])) {
-				while (!is_stack_emuty(&stack)) {
-					*output = Pop(&stack);
+				while (!is_stack_emuty(stack)) {
+					*output = Pop(stack);
 					output++;
 				}
 			}
-			Push(&stack, input[i]);
+			Push(stack, input[i]);
 		}
 		else {
 			*output = input[i];
@@ -58,8 +58,8 @@ void Infix2Postfix(char* const input, char* output)
 	}
 
 	// 남은 연산자 출력
-	while (!is_stack_emuty(&stack)) {
-		*output = Pop(&stack);
+	while (!is_stack_emuty(stack)) {
+		*output = Pop(stack);
 		output++;
 	}
 }

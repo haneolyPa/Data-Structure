@@ -13,28 +13,33 @@ int evalPostfix(char *exp)
 	int oper1, oper2, i = 0;
 	int length = (int)strlen(exp);
 	char symbol;
+	int res;
 
-	STACK stack = CreateS(length);
+	STACK_PTR stack = CreateS(length);
 	
 	for (i = 0; i < length; i++) {
 		symbol = exp[i];
 		if (symbol != '+' && symbol != '-' && symbol != '*' && symbol != '/') {
-			Push(&stack, symbol);
+			Push(stack, symbol);
 		}
 		else {
-			oper1 = CHAR2NUM(Pop(&stack));
-			oper2 = CHAR2NUM(Pop(&stack));
+			oper1 = CHAR2NUM(Pop(stack));
+			oper2 = CHAR2NUM(Pop(stack));
 			switch (symbol)
 			{
-			case '+': Push(&stack, NUM2CHAR(oper1 + oper2)); break;
-			case '-': Push(&stack, NUM2CHAR(oper1 - oper2)); break;
-			case '*': Push(&stack, NUM2CHAR(oper1 * oper2)); break;
-			case '/': Push(&stack, NUM2CHAR(oper1 / oper2)); break;
+			case '+': Push(stack, NUM2CHAR(oper1 + oper2)); break;
+			case '-': Push(stack, NUM2CHAR(oper1 - oper2)); break;
+			case '*': Push(stack, NUM2CHAR(oper1 * oper2)); break;
+			case '/': Push(stack, NUM2CHAR(oper1 / oper2)); break;
 			}
 		}
 	}
 
-	return CHAR2NUM(Pop(&stack));
+	res = CHAR2NUM(Pop(stack));
+	
+	deleteS(stack);
+
+	return res;
 }
 
 int main()
