@@ -37,7 +37,7 @@ bool IsEmpty_q(QUEUE_PTR pQueue)
 void Add_q(QUEUE_PTR pQueue, char data)
 {
 	if (IsFull_q(pQueue)) {
-		printf("Queue is full!!");
+		printf("Queue is full!!\n");
 		return;
 	}
 
@@ -45,14 +45,14 @@ void Add_q(QUEUE_PTR pQueue, char data)
 	return;
 }
 
-char Delete_q(QUEUE_PTR pQueue)
+void Delete_q(QUEUE_PTR pQueue)
 {
 	if (IsEmpty_q(pQueue)) {
-		printf("Queue is full!!");
-		return (char)-1;
+		printf("Queue is Empty!!\n");
+		return ;
 	}
 
-	return pQueue->pData[++pQueue->front];
+	pQueue->pData[++pQueue->front] = 0;
 }
 
 void PrintQueue(const QUEUE_PTR pQueue)
