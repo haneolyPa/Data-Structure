@@ -10,8 +10,8 @@ typedef struct _node {		// 트리의 노드
 } TREE_NODE;
 typedef TREE_NODE * TREE_NODE_PTR;
 
-typedef struct _Tree {			// 트리 구조체
-	TREE_NODE_PTR root;			// 루트 노드 포인터
+typedef struct _Tree {			// 이중 연결 리스트의 헤드 노드 구조 정의
+	TREE_NODE_PTR root;
 } BIN_TREE;
 typedef BIN_TREE * BIN_TREE_PTR;
 
@@ -57,7 +57,7 @@ void deleteBTree(BIN_TREE_PTR tree)
 void preorder(TREE_NODE_PTR node)
 {
 	if (node != NULL) {
-		printf("%d", node->info);
+		printf("%c", node->info);
 		preorder(node->left);
 		preorder(node->right);
 	}
@@ -68,7 +68,7 @@ void inorder(TREE_NODE_PTR node)
 {
 	if (node != NULL) {
 		inorder(node->left);
-		printf("%d", node->info);
+		printf("%c", node->info);
 		inorder(node->right);
 	}
 }
@@ -79,93 +79,82 @@ void postorder(TREE_NODE_PTR node)
 	if (node != NULL) {
 		postorder(node->left);
 		postorder(node->right);
-		printf("%d", node->info);
+		printf("%c", node->info); 
 	}
 }
- 
+
+// 삽입
+TREE_NODE_PTR addData_BSTree(TREE_NODE_PTR node, int data)
+{
+	if (node == NULL) {
+		return createBNode(data, NULL, NULL);
+	}
+
+	if (node->info == data)
+		return node;
+	else if (node->info > data)
+		node->left = addData_BSTree(node->left, data);
+	else
+		node->right = addData_BSTree(node->right, data);
+
+	return node;
+}
+
 // 검색
-TREE_NODE_PTR search(TREE_NODE_PTR node, NODE_DATA_TYPE data)
+TREE_NODE_PTR search_BSTree(TREE_NODE_PTR node, int data)
 {
 	if (node == NULL)
 		return NULL;
-		
-	if (node->info > data)
-		return search(node->left, data);
-	else if (node->info < data)
-		return search(node->right, data);
+
+	if (node->info == data)
+		return node;
+	else if (node->info > data)
+		return search_BSTree(node->left, data);
+	else
+		return search_BSTree(node->right, data);
+}
+
+TREE_NODE_PTR firstNode_inorder(TREE_NODE_PTR node)
+{
+	if (node == NULL)
+		return NULL;
+
+	while (node->left != NULL)
+		node = node->left;
 
 	return node;
 }
 
-
-// 트리에 node 추가
-TREE_NODE_PTR add_Node(TREE_NODE_PTR node, NODE_DATA_TYPE data)
-{	
-	if (node == NULL)
-		return createBNode(data, NULL, NULL);
-
-	if (node->info > data) {
-		node->left = add_Node(node->left, data);
-	}
-	else if (node->info < data) {
-		node->right = add_Node(node->left, data);
-	}
-
-	return node;
-}
-
-TREE_NODE_PTR inorder_first_Node(TREE_NODE_PTR node)
+// 삭제
+TREE_NODE_PTR deleteData_BSTree(TREE_NODE_PTR node, int data)
 {
-	TREE_NODE_PTR res_node = node;
-	if (node == NULL)
-		return node;
+	TREE_NODE_PTR del_Node = search_BSTree(node, data); 
+	TREE_NODE_PTR temp_Node = NULL;
 
-	while (res_node->left != NULL)
-		res_node = res_node->left;
-
-	return res_node;
-}
-
-TREE_NODE_PTR inorder_last_Node(TREE_NODE_PTR node)
-{
-	TREE_NODE_PTR res_node = node;
-	if (node == NULL)
-		return node;
-
-	while (res_node->right != NULL)
-		res_node = res_node->right;
-
-	return res_node;
-}
-
-// 트리에서 node 제거
-void delete_Node(TREE_NODE_PTR node, NODE_DATA_TYPE data) // 트리에서 data 가 값인 node 를 찾아 제거
-{
-	TREE_NODE_PTR del_Node = search(node, data);		// 제거하려는 node
-	TREE_NODE_PTR chage_Node = NULL;
-	
 	if (del_Node == NULL)
-		return;
+		return NULL;
 
-	// 오른쪽 서브 트리에서 중위 순회 첫번째 node 검색
-	if ((chage_Node = inorder_first_Node(del_Node->right)) == NULL) {
-		// 왼쪽 트리의 중위 순회 마지막 node 검색
-		chage_Node = inorder_last_Node;
+	if (del_Node->left != NULL && del_Node->right != NULL) {
+		temp_Node = firstNode_inorder(del_Node->right);
+		del_Node->info = temp_Node->info;
+		del_Node->right = deleteData_BSTree(del_Node->right, temp_Node->info);
+	} else {
+		temp_Node = (del_Node->right == NULL) ? del_Node->left : del_Node->right;
+
+		if (temp_Node != NULL) {
+			del_Node->info = temp_Node->info;
+			temp_Node = deleteData_BSTree(temp_Node, temp_Node->info);
+		}
+		else {
+			deleteBNode(del_Node);
+			return NULL;
+		}
 	}
 
-	// 자식 노드가 없는 경우 그냥 삭제
-	if (chage_Node == NULL)
-		deleteBNode(del_Node);
-
-	
+	return del_Node;
 }
-
-
-
 
 int main()
 {
-
-
 	return 0;
 }
