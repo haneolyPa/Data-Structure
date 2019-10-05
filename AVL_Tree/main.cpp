@@ -3,14 +3,50 @@
 
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 
-typedef struct AvlNode
+typedef int NODE_DATA_TYPE;
+
+typedef struct _node {		// 트리의 노드
+	struct _node * left;
+	struct _node * right;
+	NODE_DATA_TYPE info;
+} TREE_NODE;
+typedef TREE_NODE * TREE_NODE_PTR;
+
+typedef struct _Tree {			// 이중 연결 리스트의 헤드 노드 구조 정의
+	TREE_NODE_PTR root;
+} BIN_TREE;
+typedef BIN_TREE * BIN_TREE_PTR;
+
+// 이진트리 노드 생성
+TREE_NODE_PTR createBNode(NODE_DATA_TYPE data, TREE_NODE_PTR left, TREE_NODE_PTR right)
 {
-	int data; // key 값
-	AvlNode *left_child, *right_child;
-}AvlNode;
+	TREE_NODE_PTR newBNode = (TREE_NODE_PTR)malloc(sizeof(TREE_NODE));
 
-AvlNode *root;
+	newBNode->info = data;
+	newBNode->left = left;
+	newBNode->right = right;
 
+	return newBNode;
+}
+
+// 이진트리 노드 제거
+void deleteBNode(TREE_NODE_PTR node)
+{
+	if (node == NULL)
+		return;
+
+	deleteBNode(node->left);
+	deleteBNode(node->right);
+	free(node);
+}
+
+// 트리 생성
+BIN_TREE_PTR createBTree()
+{
+	BIN_TREE_PTR newTree = (BIN_TREE_PTR)malloc(sizeof(BIN_TREE));
+	newTree->root = NULL;
+	return newTree;
+}
 
 // LL 회전 (오른쪽으로 회전한다)
 //     A
@@ -19,14 +55,14 @@ AvlNode *root;
 //  /                C   A
 // C
 //
-// ±2를 가지는 A가 부모가 되고 A->left_child인 B가 child가 된다.
-// A->left에 B가 가지고 있는 right_child를 대입하고 B의 right_child에 A을 대입한다.
+// ±2를 가지는 A가 부모가 되고 A->left인 B가 child가 된다.
+// A->left에 B가 가지고 있는 right를 대입하고 B의 right에 A을 대입한다.
 
-AvlNode* rotate_LL(AvlNode *parent)
+TREE_NODE_PTR rotate_LL(TREE_NODE_PTR parent)
 {
-	AvlNode *child = parent->left_child;
-	parent->left_child = child->right_child;
-	child->right_child = parent;
+	TREE_NODE_PTR child = parent->left;
+	parent->left = child->right;
+	child->right = parent;
 	return child;
 }
 
@@ -37,14 +73,14 @@ AvlNode* rotate_LL(AvlNode *parent)
 //        \           A   C
 //         C
 //
-// ±2를 가지는 A가 부모가 되고 A->right_child인 B가 child가 된다.
-// A->right에 B가 가지고 있는 left_child를 대입하고 B의 left_child에 A을 대입한다.
+// ±2를 가지는 A가 부모가 되고 A->right인 B가 child가 된다.
+// A->right에 B가 가지고 있는 left를 대입하고 B의 left에 A을 대입한다.
 
-AvlNode* rotate_RR(AvlNode *parent)
+TREE_NODE_PTR rotate_RR(TREE_NODE_PTR parent)
 {
-	AvlNode *child = parent->right_child;
-	parent->right_child = child->left_child;
-	child->left_child = parent;
+	TREE_NODE_PTR child = parent->right;
+	parent->right = child->left;
+	child->left = parent;
 	return child;
 }
 
@@ -55,14 +91,14 @@ AvlNode* rotate_RR(AvlNode *parent)
 //      /                  \            A   B
 //     C                    B
 //
-// ±2를 가지는 A가 부모가 되고 A->right_child인 B가 child가 된다.
-// A->right_child에 rotate_LL(B)가 반환하는 값을 대입한다. (B,C에 대해 오른쪽 회전)
+// ±2를 가지는 A가 부모가 되고 A->right인 B가 child가 된다.
+// A->right에 rotate_LL(B)가 반환하는 값을 대입한다. (B,C에 대해 오른쪽 회전)
 // rotate_LL(B)호출시 B와 C가 변화가 생기고 다시 rotate_RR(A)을 호출하면 균형트리가 된다. 
 
-AvlNode* rotate_RL(AvlNode *parent)
+TREE_NODE_PTR rotate_RL(TREE_NODE_PTR parent)
 {
-	AvlNode *child = parent->right_child;
-	parent->right_child = rotate_LL(child);
+	TREE_NODE_PTR child = parent->right;
+	parent->right = rotate_LL(child);
 	return rotate_RR(parent);
 }
 
@@ -73,123 +109,116 @@ AvlNode* rotate_RL(AvlNode *parent)
 //    \               /                  A   B
 //     C             B      
 //
-// ±2를 가지는 A가 부모가 되고 A->left_child인 B가 child가 된다.
-// A->left_child에 rotate_RR(B)가 반환하는 값을 대입한다. (B,C에 대해 왼쪽 회전)
+// ±2를 가지는 A가 부모가 되고 A->left인 B가 child가 된다.
+// A->left에 rotate_RR(B)가 반환하는 값을 대입한다. (B,C에 대해 왼쪽 회전)
 // rotate_RR(B)호출시 B와 C가 변화가 생기고 다시 rotate_LL(A)을 호출하면 균형트리가 된다. 
 
-AvlNode* rotate_LR(AvlNode *parent)
+TREE_NODE_PTR rotate_LR(TREE_NODE_PTR parent)
 {
-	AvlNode *child = parent->left_child;
-	parent->left_child = rotate_RR(child);
+	TREE_NODE_PTR child = parent->left;
+	parent->left = rotate_RR(child);
 	return rotate_LL(parent);
 }
 
 // 트리의 높이 측정 함수
 // 순환호출로 각각의 높이를 구하고 이들 중에서 더 큰값에 1을 더하면 트리의 높이가 된다.
-int get_height(AvlNode *node)
+int get_height(TREE_NODE_PTR node)
 {
 	int height = 0;
 	if (node != NULL)
-		height = 1 + max(get_height(node->left_child), get_height(node->right_child));
+		height = 1 + max(get_height(node->left), get_height(node->right));
 	return height;
 }
 
 // 노드의 균형인수 반환 함수
 // 왼쪽 서브트리 높이 - 오른쪽 서브트리 높이
-int get_balance(AvlNode *node)
+int get_balance(TREE_NODE_PTR node)
 {
 	if (node == NULL) return 0;
-	return get_height(node->left_child) - get_height(node->right_child);
+	return get_height(node->left) - get_height(node->right);
 }
 
 // 균형 트리를 만드는 함수
-AvlNode* balance_tree(AvlNode **node)
+TREE_NODE_PTR balance_tree(TREE_NODE_PTR node)
 {
-	int height_diff = get_balance(*node);
+	int height_diff = get_balance(node);
 
 	if (height_diff > 1) // 왼쪽 서브트리의 균형을 맞춘다
 	{
-		if (get_balance((*node)->left_child) > 0)
-			*node = rotate_LL(*node);
+		if (get_balance(node->left) > 0)
+			node = rotate_LL(node);
 		else
-			*node = rotate_LR(*node);
+			node = rotate_LR(node);
 	}
 	else if (height_diff < -1) // 오른쪽 서브트리의 균형을 맞춘다
 	{
-		if (get_balance((*node)->right_child) < 0)
-			*node = rotate_RR(*node);
+		if (get_balance(node->right) < 0)
+			node = rotate_RR(node);
 		else
-			*node = rotate_RL(*node);
+			node = rotate_RL(node);
 	}
-	return *node;
+	return node;
 }
 
 // AVL 트리의 삽입 연산
 // key에 대해 순환호출을 반복하므로써 트리에 삽입 한 후 균형화 함수를 호출한다.
-AvlNode* avl_add(AvlNode **root, int key)
+TREE_NODE_PTR avl_add(TREE_NODE_PTR node, int key)
 {
-	if (*root == NULL)
+	if (node == NULL)
 	{
-		*root = (AvlNode*)malloc(sizeof(AvlNode));
-		if (*root == NULL)
-		{
-			printf("메모리 할당 실패\n");
-			exit(-1);
-		}
+		node = createBNode(key, NULL, NULL);
+		return node;
+	}
 
-		(*root)->data = key;
-		(*root)->left_child = (*root)->right_child = NULL;
-	}
-	else if (key < (*root)->data)
+	if (key < node->info)
 	{
-		(*root)->left_child = avl_add(&((*root)->left_child), key);
-		(*root) = balance_tree(root);
+		node->left = avl_add(node->left, key);
+		node = balance_tree(node);
 	}
-	else if (key > (*root)->data)
+	else if (key > node->info)
 	{
-		(*root)->right_child = avl_add(&((*root)->right_child), key);
-		(*root) = balance_tree(root);
+		node->right = avl_add(node->right, key);
+		node = balance_tree(node);
 	}
-	else
-	{
-		printf("중복 키로 인한 삽입 실패\n");
-		exit(-1);
-	}
-	return *root;
+	
+	return node;
 }
 
 // AVL 트리 탐색 함수
 // 일반 적인 이진 트리의 탐색 함수와 같다. AVL도 이진 탐색 트리의 일종이다.
-AvlNode* avl_search(AvlNode *node, int key)
+TREE_NODE_PTR avl_search(TREE_NODE_PTR node, int key)
 {
 	if (node == NULL) return NULL;
 
-	printf("%d->", node->data);
+	printf("%d->", node->info);
 
-	if (key == node->data)
+	if (key == node->info)
 		return node;
-	else if (key < node->data)
-		avl_search(node->left_child, key);
+	else if (key < node->info)
+		return avl_search(node->left, key);
 	else
-		avl_search(node->right_child, key);
+		return avl_search(node->right, key);
 }
 
 int main()
 {
-	avl_add(&root, 8);
-	avl_add(&root, 9);
-	avl_add(&root, 10);
-	avl_add(&root, 2);
-	avl_add(&root, 1);
-	avl_add(&root, 5);
-	avl_add(&root, 3);
-	avl_add(&root, 6);
-	avl_add(&root, 4);
-	avl_add(&root, 7);
-	avl_add(&root, 11);
-	avl_add(&root, 12);
+	BIN_TREE_PTR pBTree = createBTree();
+	TREE_NODE_PTR node;
 
-	avl_search(root, 12);
+	avl_add(pBTree->root, 8);
+	avl_add(pBTree->root, 9);
+	avl_add(pBTree->root, 10);
+	avl_add(pBTree->root, 2);
+	avl_add(pBTree->root, 1);
+	avl_add(pBTree->root, 5);
+	avl_add(pBTree->root, 3);
+	avl_add(pBTree->root, 6);
+	avl_add(pBTree->root, 4);
+	avl_add(pBTree->root, 7);
+	avl_add(pBTree->root, 11);
+	avl_add(pBTree->root, 12);
+
+	avl_search(pBTree->root, 12);
 
 	return 0;
 }
