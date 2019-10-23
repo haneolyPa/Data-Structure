@@ -172,6 +172,8 @@ AvlNode* avl_search(AvlNode *node, int key)
 		avl_search(node->left_child, key);
 	else
 		avl_search(node->right_child, key);
+
+	return node;
 }
 
 int main()
