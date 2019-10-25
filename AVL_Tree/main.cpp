@@ -197,7 +197,9 @@ TREE_NODE_PTR avl_search(TREE_NODE_PTR node, int key)
 	else if (key < node->info)
 		return avl_search(node->left, key);
 	else
-		return avl_search(node->right, key);
+		avl_search(node->right_child, key);
+
+	return node;
 }
 
 int main()
