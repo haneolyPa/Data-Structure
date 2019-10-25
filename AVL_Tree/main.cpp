@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "queue.h"
+
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 
 typedef int NODE_DATA_TYPE;
 
 typedef struct _node {		// 트리의 노드
-	struct _node * left;
-	struct _node * right;
+	_node * left;
+	_node * right;
 	NODE_DATA_TYPE info;
 } TREE_NODE;
 typedef TREE_NODE * TREE_NODE_PTR;
 
-typedef struct _Tree {			// 이중 연결 리스트의 헤드 노드 구조 정의
+typedef struct _Tree {			// 트리 자료 구조
 	TREE_NODE_PTR root;
 } BIN_TREE;
 typedef BIN_TREE * BIN_TREE_PTR;
@@ -162,26 +164,24 @@ TREE_NODE_PTR balance_tree(TREE_NODE_PTR node)
 
 // AVL 트리의 삽입 연산
 // key에 대해 순환호출을 반복하므로써 트리에 삽입 한 후 균형화 함수를 호출한다.
-TREE_NODE_PTR avl_add(TREE_NODE_PTR node, int key)
+TREE_NODE_PTR avl_add(TREE_NODE_PTR* node, int key)
 {
 	if (node == NULL)
+		return NULL;
+
+	if ((*node) == NULL)
 	{
-		node = createBNode(key, NULL, NULL);
-		return node;
+		(*node) = createBNode(key, NULL, NULL);
+		return *node;
 	}
 
-	if (key < node->info)
-	{
-		node->left = avl_add(node->left, key);
-		node = balance_tree(node);
-	}
-	else if (key > node->info)
-	{
-		node->right = avl_add(node->right, key);
-		node = balance_tree(node);
-	}
+	if (key < (*node)->info)
+		(*node)->left = avl_add(&(*node)->left, key);
+	else if (key > (*node)->info)
+		(*node)->right = avl_add(&(*node)->right, key);
 	
-	return node;
+	(*node) = balance_tree((*node));
+	return (*node);
 }
 
 // AVL 트리 탐색 함수
@@ -197,30 +197,60 @@ TREE_NODE_PTR avl_search(TREE_NODE_PTR node, int key)
 	else if (key < node->info)
 		return avl_search(node->left, key);
 	else
-		avl_search(node->right_child, key);
+		avl_search(node->right, key);
 
 	return node;
+}
+
+// 레벨 순회
+void levelorder(TREE_NODE_PTR node)
+{
+	QUEUE_PTR queue = Create_q(5 * 2);
+	TREE_NODE_PTR temp_Node;
+	if (node == NULL)
+		return;
+
+	Add_q(queue, node);
+	while (!IsEmpty_q(queue))
+	{
+		temp_Node = (TREE_NODE_PTR)Delete_q(queue);
+
+		if (temp_Node) {
+			printf("%d ", temp_Node->info);
+			Add_q(queue, temp_Node->left);
+			Add_q(queue, temp_Node->right);
+		}
+		else {
+			printf("NULL ");
+		}
+	}
+
+	printf("\n");
+
+	delete_q(queue);
 }
 
 int main()
 {
 	BIN_TREE_PTR pBTree = createBTree();
-	TREE_NODE_PTR node;
+	//TREE_NODE_PTR node;
 
-	avl_add(pBTree->root, 8);
-	avl_add(pBTree->root, 9);
-	avl_add(pBTree->root, 10);
-	avl_add(pBTree->root, 2);
-	avl_add(pBTree->root, 1);
-	avl_add(pBTree->root, 5);
-	avl_add(pBTree->root, 3);
-	avl_add(pBTree->root, 6);
-	avl_add(pBTree->root, 4);
-	avl_add(pBTree->root, 7);
-	avl_add(pBTree->root, 11);
-	avl_add(pBTree->root, 12);
+	avl_add(&pBTree->root, 1);
+	avl_add(&pBTree->root, 2);
+	avl_add(&pBTree->root, 3);
+	avl_add(&pBTree->root, 4);
+	avl_add(&pBTree->root, 5);
+	avl_add(&pBTree->root, 6);
+	avl_add(&pBTree->root, 7);
+	avl_add(&pBTree->root, 8);
+	avl_add(&pBTree->root, 9);
+	avl_add(&pBTree->root, 10);
+	avl_add(&pBTree->root, 11);
+	avl_add(&pBTree->root, 12);
 
-	avl_search(pBTree->root, 12);
+	//node = avl_search(pBTree->root, 12);
+
+	levelorder(pBTree->root);
 
 	return 0;
 }
