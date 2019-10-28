@@ -246,8 +246,17 @@ TREE_NODE_PTR balance_tree(TREE_NODE_PTR node)
 					node = rotate_RR(temp_GrandParent);
 				}
 
+				if (node->parent != NULL) {
+					if (temp_Parent == node->parent->left)
+						node->parent->left = node;
+					else
+						node->parent->right = node;
+				}
+							   
 				temp_Parent->color = BLACK;
 				temp_GrandParent->color = RED;
+
+
 				node = balance_tree(node);
 			}
 		}

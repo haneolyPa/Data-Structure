@@ -197,9 +197,7 @@ TREE_NODE_PTR avl_search(TREE_NODE_PTR node, int key)
 	else if (key < node->info)
 		return avl_search(node->left, key);
 	else
-		avl_search(node->right, key);
-
-	return node;
+		return avl_search(node->right, key);
 }
 
 // 레벨 순회
