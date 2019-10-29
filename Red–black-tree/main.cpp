@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "queue.h"
+
+
 // 노드의 키 자료형
 typedef int NODE_DATA_TYPE;
 
@@ -199,15 +202,15 @@ TREE_NODE_PTR rotate_LR(TREE_NODE_PTR parent)
 TREE_NODE_PTR balance_tree(TREE_NODE_PTR node)
 {
 	TREE_NODE_PTR parent = getParent(node);
-
+		
 	if (parent == NULL)	// 루트 노드인 경우
 	{
 		if (node != NULL)
 			node->color = BLACK;
 	}
-	else if(parent->color == BLACK)
+	else if(parent->color == BLACK || node->color == BLACK)
 	{
-		node = parent;
+		node = balance_tree(parent);
 	}
 	else		// 부모 노드가  레드(RED)인 경우
 	{
@@ -246,16 +249,17 @@ TREE_NODE_PTR balance_tree(TREE_NODE_PTR node)
 					node = rotate_RR(temp_GrandParent);
 				}
 
+				temp_Parent->color = BLACK;
+				temp_GrandParent->color = RED;
+
 				if (node->parent != NULL) {
 					if (temp_Parent == node->parent->left)
 						node->parent->left = node;
 					else
 						node->parent->right = node;
-				}
-							   
-				temp_Parent->color = BLACK;
-				temp_GrandParent->color = RED;
 
+					node = node->parent;
+				}
 
 				node = balance_tree(node);
 			}
@@ -315,22 +319,60 @@ TREE_NODE_PTR RBTree_add(TREE_NODE_PTR* root, NODE_DATA_TYPE key)
 	return (*root);
 }
 
+// 레벨 순회
+void levelorder(TREE_NODE_PTR node)
+{
+	QUEUE_PTR queue = Create_q(5 * 2);
+	TREE_NODE_PTR temp_Node;
+	if (node == NULL)
+		return;
+
+	Add_q(queue, node);
+	while (!IsEmpty_q(queue))
+	{
+		temp_Node = (TREE_NODE_PTR)Delete_q(queue);
+
+		if (temp_Node) {
+			printf("%d ", temp_Node->key);
+			Add_q(queue, temp_Node->left);
+			Add_q(queue, temp_Node->right);
+		}
+		else {
+			printf("NULL ");
+		}
+	}
+
+	printf("\n");
+
+	delete_q(queue);
+}
+
 int main()
 {
 	BIN_TREE_PTR pBTree = createBTree();
 
 	RBTree_add(&pBTree->root, 1);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 2);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 3);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 4);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 5);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 6);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 7);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 8);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 9);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 10);
+	levelorder(pBTree->root);
 	RBTree_add(&pBTree->root, 11);
-
+	levelorder(pBTree->root);
 
 	return 0;
 }
