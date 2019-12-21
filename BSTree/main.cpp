@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "queue.h"
+
 typedef int NODE_DATA_TYPE;
 
 typedef struct _node {		// 트리의 노드
@@ -57,8 +59,8 @@ void deleteBTree(BIN_TREE_PTR tree)
 void preorder(TREE_NODE_PTR node)
 {
 	if (node != NULL) {
-		printf("%c", node->info);
-		preorder(node->left);
+		printf("%d ", node->info);
+		preorder(node->left); 
 		preorder(node->right);
 	}
 }
@@ -68,7 +70,7 @@ void inorder(TREE_NODE_PTR node)
 {
 	if (node != NULL) {
 		inorder(node->left);
-		printf("%c", node->info);
+		printf("%d ", node->info);
 		inorder(node->right);
 	}
 }
@@ -79,8 +81,36 @@ void postorder(TREE_NODE_PTR node)
 	if (node != NULL) {
 		postorder(node->left);
 		postorder(node->right);
-		printf("%c", node->info); 
+		printf("%d ", node->info); 
 	}
+}
+
+// 레벨 순회
+void levelorder(TREE_NODE_PTR node)
+{
+	QUEUE_PTR queue = Create_q(4*2);
+	TREE_NODE_PTR temp_Node;
+	if (node == NULL)
+		return;
+
+	Add_q(queue, node);
+	while (!IsEmpty_q(queue))
+	{
+		temp_Node = (TREE_NODE_PTR)Delete_q(queue);
+
+		if (temp_Node) {
+			printf("%d ", temp_Node->info);
+			Add_q(queue, temp_Node->left);
+			Add_q(queue, temp_Node->right);
+		}
+		else {
+			printf("0 ");
+		}
+	}
+
+	printf("\n");
+
+	delete_q(queue);
 }
 
 // 삽입
@@ -127,34 +157,62 @@ TREE_NODE_PTR firstNode_inorder(TREE_NODE_PTR node)
 
 // 삭제
 TREE_NODE_PTR deleteData_BSTree(TREE_NODE_PTR node, int data)
-{
-	TREE_NODE_PTR del_Node = search_BSTree(node, data); 
+{	
 	TREE_NODE_PTR temp_Node = NULL;
 
-	if (del_Node == NULL)
+	if (node == NULL)
 		return NULL;
 
-	if (del_Node->left != NULL && del_Node->right != NULL) {
-		temp_Node = firstNode_inorder(del_Node->right);
-		del_Node->info = temp_Node->info;
-		del_Node->right = deleteData_BSTree(del_Node->right, temp_Node->info);
-	} else {
-		temp_Node = (del_Node->right == NULL) ? del_Node->left : del_Node->right;
-
-		if (temp_Node != NULL) {
-			del_Node->info = temp_Node->info;
-			temp_Node = deleteData_BSTree(temp_Node, temp_Node->info);
+	if (node->info == data) {
+		if (node->left != NULL && node->right != NULL) {
+			temp_Node = firstNode_inorder(node->right);
+			node->info = temp_Node->info;
+			node->right = deleteData_BSTree(node->right, temp_Node->info);
 		}
 		else {
-			deleteBNode(del_Node);
-			return NULL;
+			temp_Node = (node->right == NULL) ? node->left : node->right;
+			deleteBNode(node);
+			return temp_Node;
 		}
 	}
+	else if (node->info > data)
+		node->left = deleteData_BSTree(node->left, data);
+	else
+		node->right = deleteData_BSTree(node->right, data);
 
-	return del_Node;
+	return node;
 }
 
 int main()
 {
+	BIN_TREE_PTR pBTree = createBTree();
+
+	pBTree->root = addData_BSTree(pBTree->root, 5);
+	levelorder(pBTree->root);
+
+	pBTree->root = addData_BSTree(pBTree->root, 3);
+	levelorder(pBTree->root);
+
+	pBTree->root = addData_BSTree(pBTree->root, 7);
+	levelorder(pBTree->root);
+
+	pBTree->root = addData_BSTree(pBTree->root, 1);
+	levelorder(pBTree->root);
+	
+	pBTree->root = addData_BSTree(pBTree->root, 9);
+	levelorder(pBTree->root);
+
+	pBTree->root = addData_BSTree(pBTree->root, 6);
+	levelorder(pBTree->root);
+
+	pBTree->root = deleteData_BSTree(pBTree->root, 7);
+	levelorder(pBTree->root);
+
+	pBTree->root = addData_BSTree(pBTree->root, 2);
+	levelorder(pBTree->root);
+
+	pBTree->root = deleteData_BSTree(pBTree->root, 2);
+	levelorder(pBTree->root);
+
 	return 0;
 }
