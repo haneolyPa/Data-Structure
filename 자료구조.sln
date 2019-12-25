@@ -45,6 +45,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "12장 13장 멀티웨이 �
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Red–black-tree", "Red–black-tree\Red–black-tree.vcxproj", "{A0E4D7F3-377E-4F19-AA51-660B0CF2F59A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git 실습", "git 실습", "{4BA3EF90-D747-4AEB-96B5-3413C59F613D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "자료구조 실습 회원", "자료구조 실습 회원\자료구조 실습 회원.vcxproj", "{9757ED17-810D-48F7-8D20-7E81C08ECAFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -157,6 +161,14 @@ Global
 		{A0E4D7F3-377E-4F19-AA51-660B0CF2F59A}.Release|x64.Build.0 = Release|x64
 		{A0E4D7F3-377E-4F19-AA51-660B0CF2F59A}.Release|x86.ActiveCfg = Release|Win32
 		{A0E4D7F3-377E-4F19-AA51-660B0CF2F59A}.Release|x86.Build.0 = Release|Win32
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Debug|x64.ActiveCfg = Debug|x64
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Debug|x64.Build.0 = Debug|x64
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Debug|x86.ActiveCfg = Debug|Win32
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Debug|x86.Build.0 = Debug|Win32
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Release|x64.ActiveCfg = Release|x64
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Release|x64.Build.0 = Release|x64
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Release|x86.ActiveCfg = Release|Win32
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -175,6 +187,7 @@ Global
 		{4495F604-AB2B-4869-AB85-12C40EC59A1B} = {AC18160D-27F1-4EE6-B3D0-C790F44E2230}
 		{286910A9-279B-49B2-9A23-B8F35DF4B0CD} = {AC18160D-27F1-4EE6-B3D0-C790F44E2230}
 		{A0E4D7F3-377E-4F19-AA51-660B0CF2F59A} = {431EC7DF-A191-442C-A436-FF2B5FB261AA}
+		{9757ED17-810D-48F7-8D20-7E81C08ECAFE} = {4BA3EF90-D747-4AEB-96B5-3413C59F613D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C90A7553-9283-46AC-98A5-E6BAF1AC7668}
