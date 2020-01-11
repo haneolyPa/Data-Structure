@@ -1,51 +1,52 @@
-#include <stdio.h>
-#include <string.h>
 #include "Stack.h"
 
-#define INPUT_SIZE		256
+using namespace std;
 
-// 중위표기법 -> 후위표기법
-// Infix -> Postfix 변환 함수
-
-void Infix2Postfix(char* const input, char* output);
-bool isOperator(char input);
-bool Oper_Precedence(char oper1, char oper2);
+#define MAX_BUF_SIZE	256
 
 int main()
 {
-	/*char input[INPUT_SIZE] = { '\0', };
-	scanf("%s", input);*/
+	char input[MAX_BUF_SIZE] = { '\0', };
+	char output[MAX_BUF_SIZE] = { '\0', };
 
-	char input[INPUT_SIZE] = "7+8*2/4";
-	char output[INPUT_SIZE] = { '\0', };
-
-	printf("%s\n", input);
+	cout << "계산할 식을 입력해 주세요.(예: 3*8)" << endl;
+	cin >> input;
 
 	Infix2Postfix(input, output);
-
-	printf("%s\n", output);
-
-	return 0;
 }
 
 void Infix2Postfix(char* const input, char* output)
 {
-	int i = 0;
 	int inputSize = (int)strlen(input);
-	STACK_PTR stack = CreateS(inputSize);
+	CStack<char>* pStack = CStack<char>::CreateS(MAX_BUF_SIZE);
 
-	char stackTop;
+	for (int i = 0; i < inputSize; i++) {
+		if (!isOperator(input[i])) {				// 연산자 인가?
+			*output = input[i];
+			output++;
+		}
+		else {
+			// 스텍에 있는 연사자 보다 input[i] 가 우선순위가 낮으면
+			// 스텍에 있는 연산자를  Pop 합니다.
+			while (Oper_Precedence(pStack->getData(), input[i])) {
+				*output = pStack->pop();
+				output++;
+			}
+			pStack->push(input[i]);
+		}
+	}
 
 	while (i < inputSize) {
 		if (isOperator(input[i])) {				// 연산자 인가?
 			stackTop = GetTopData(stack);
 
 			// 스텍에 있는 연사자 보다 input[i] 가 우선순위가 낮으면
-			// 스텍에 있는 연산자를 Pop 합니다.
-			while (Oper_Precedence(stackTop, input[i])) {
-				*output = Pop(stack);
-				output++;
-				stackTop = GetTopData(stack);
+			// 스텍에 있는 연산자를 모두 Pop 합니다.
+			if (Oper_Precedence(stackTop, input[i])) {
+				while (!is_stack_emuty(stack)) {
+					*output = Pop(stack);
+					output++;
+				}
 			}
 			Push(stack, input[i]);
 		}
@@ -91,4 +92,13 @@ bool Oper_Precedence(char oper1, char oper2)
 	}
 
 	return false;
+}
+
+	
+
+
+
+	CStack<char>::DeleteS(pStack);
+
+	return 0;
 }
