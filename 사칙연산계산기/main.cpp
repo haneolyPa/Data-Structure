@@ -2,6 +2,10 @@
 
 using namespace std;
 
+void Infix2Postfix(char* const input, char* output);
+bool isOperator(char input);
+bool Oper_Precedence(char oper1, char oper2);
+
 #define MAX_BUF_SIZE	256
 
 int main()
@@ -13,6 +17,10 @@ int main()
 	cin >> input;
 
 	Infix2Postfix(input, output);
+
+	cout << output;
+
+	return 0;
 }
 
 void Infix2Postfix(char* const input, char* output)
@@ -36,44 +44,19 @@ void Infix2Postfix(char* const input, char* output)
 		}
 	}
 
-	while (i < inputSize) {
-		if (isOperator(input[i])) {				// 연산자 인가?
-			stackTop = GetTopData(stack);
-
-			// 스텍에 있는 연사자 보다 input[i] 가 우선순위가 낮으면
-			// 스텍에 있는 연산자를 모두 Pop 합니다.
-			if (Oper_Precedence(stackTop, input[i])) {
-				while (!is_stack_emuty(stack)) {
-					*output = Pop(stack);
-					output++;
-				}
-			}
-			Push(stack, input[i]);
-		}
-		else {
-			*output = input[i];
-			output++;
-		}
-		i++;
-	}
-
 	// 남은 연산자 출력
-	while (!is_stack_emuty(stack)) {
-		*output = Pop(stack);
+	while (!pStack->empty()) {
+		*output = pStack->pop();
 		output++;
 	}
 
-	deleteS(stack);
+	CStack<char>::DeleteS(pStack);
 }
 
 bool isOperator(char input)
 {
-	if (input == '+' || input == '-' || input == '*' || input == '/')
-		return true;
-
-	return false;
+	return (input == '+' || input == '-' || input == '*' || input == '/') ? true : false;
 }
-
 
 bool Oper_Precedence(char oper1, char oper2)
 {
@@ -84,7 +67,7 @@ bool Oper_Precedence(char oper1, char oper2)
 		return true;
 	case '+':
 	case '-':
-		if (oper2 == '+' && oper2 == '-')
+		if (oper2 == '+' || oper2 == '-')
 			return true;
 
 	default:
@@ -92,13 +75,4 @@ bool Oper_Precedence(char oper1, char oper2)
 	}
 
 	return false;
-}
-
-	
-
-
-
-	CStack<char>::DeleteS(pStack);
-
-	return 0;
 }
