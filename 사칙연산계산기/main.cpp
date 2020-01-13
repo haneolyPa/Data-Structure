@@ -4,7 +4,7 @@ using namespace std;
 
 // 중위표기법을 후위표기법으로 변경하는 함수
 void Infix2Postfix(char* const input, char* output);
-bool Infix2Postfix_bracket(char* const input, char* output);
+int Infix2Postfix_bracket(char* const input, char* output);
 
 // 연사자인자 판단 함수
 // 'input' 이 연산자('+', '-', '*', '/')이면 true 이고, 아니면 false
@@ -144,7 +144,7 @@ void copy_buf(char* input, char* output)
 	}
 }
 
-bool Infix2Postfix_bracket(char* const input, char* output)
+int Infix2Postfix_bracket(char* const input, char* output)
 {
 	static int call_num = 0;			// 괄호 카운트
 	int length = (int)strlen(input);
@@ -154,10 +154,12 @@ bool Infix2Postfix_bracket(char* const input, char* output)
 		if (isLeftBracket(input[i])) {
 			char output_temp[MAX_BUF_SIZE] = { 0, };
 			call_num++;
-			Infix2Postfix_bracket(&input[++i], output_temp);
+
+			i += Infix2Postfix_bracket(&input[++i], output_temp);
+			
 			// output_temp 를 output 에 복사
 			copy_buf(output, output_temp);
-			i += (int)(strlen(output_temp));
+			
 			output += strlen(output_temp);
 		}
 		else if (isRightBracket(input[i])) {
@@ -169,7 +171,7 @@ bool Infix2Postfix_bracket(char* const input, char* output)
 			}
 
 			CStack<char>::DeleteS(pStack);
-			return true;
+			return i;
 		}
 		else {
 			if (!isOperator(input[i])) {				// 연산자 인가?
