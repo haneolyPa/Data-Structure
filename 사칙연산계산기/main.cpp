@@ -42,16 +42,27 @@ int main()
 	char input[MAX_BUF_SIZE] = { '\0', };
 	char output[MAX_BUF_SIZE] = { '\0', };
 
-	cout << "계산할 식을 입력해 주세요.(예: 3*8)" << endl;
-	cin >> input;
+	while (true) {
+		cout << "계산할 식을 입력해 주세요.(예: 3*8)" << endl;
+		cout << "종료 하시려면 'q'를 입력해 주세요." << endl;
+		cin >> input;
+		if (input[0] == 'q')
+			break;
 
-	Infix2Postfix(input, output);
+		Infix2Postfix(input, output);
 
-	cout << endl << "중위 표기법으로 변경된 수식" << endl;
-	cout << output << endl;
+		cout << endl << "중위 표기법으로 변경된 수식" << endl;
+		cout << output << endl;
 
-	cout << "계산 결과는 : " << endl;
-	cout << evalPostfix(output) << endl;
+		cout << "계산 결과는 : " << endl;
+		cout << evalPostfix(output) << endl;
+		cout << endl << endl;
+		cout << "계속 : 'c' 종료 : 'q'" << endl;
+		cin >> input;
+		if (input[0] == 'q')
+			break;
+		system("cls");
+	}
 
 	return 0;
 }
